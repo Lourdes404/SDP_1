@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilos para la barra lateral y la barra superior */
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+        }
+        .sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            color: #ffffff;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra lateral -->
+    <div class="sidebar p-3">
+        <h3>Panel de control</h3>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Menú principal</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Buscar documentos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Configuración</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Salir</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <!-- Barra superior -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Rol de usuario</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Estudiante</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Área de contenido dinámico -->
+        <div>
+            {% block content %} {% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
