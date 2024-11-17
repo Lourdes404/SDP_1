@@ -67,15 +67,15 @@ WSGI_APPLICATION = 'SDP.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'rdsadmin',  # Nombre de la base de datos
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'SDP',  # Nombre de la base de datos
         'USER': 'lourdes',  # Usuario
         'PASSWORD': 'N30TTNNs.',  # Contraseña
-        'HOST': 'sqlserver.c9magi66atn7.us-east-2.rds.amazonaws.com',  # Endpoint de la RDS
-        'PORT': '1433',  # Puerto
+        'HOST': 'sdpservidor.database.windows.net',  # Endpoint de la RDS
+        'PORT': '',  # Puerto
         'OPTIONS': {
             'driver': 'ODBC Driver 18 for SQL Server',  # Driver ODBC instalado en tu sistema
-            'TrustServerCertificate': 'yes',
+            #'TrustServerCertificate': 'yes',
         },
     }
 }
@@ -138,3 +138,4 @@ MICROSOFT = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
