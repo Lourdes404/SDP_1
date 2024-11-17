@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'SDP.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
+        'ENGINE': 'mssql',
         'NAME': 'SDP',  # Nombre de la base de datos
         'USER': 'lourdes',  # Usuario
         'PASSWORD': 'N30TTNNs.',  # Contraseña
