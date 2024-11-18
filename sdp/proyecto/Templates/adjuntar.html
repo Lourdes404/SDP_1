@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Adjuntar
+
+
+{% endblock %}
+
+{% block content %}
+
+
+    <style>
+        .body {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+    </style>
+
+    <div class="body">
+        <div class="form-container">
+            <h3 class="text-center mb-4">Adjunta tu tesis</h3>
+            <form action="#" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="nombres" class="form-label">Nombres</label>
+                    <input type="text" class="form-control" id="nombres" name="nombres" placeholder="Nombres" required>
+                </div>
+                <div class="mb-3">
+                    <label for="apellidos" class="form-label">Apellidos</label>
+                    <input type="text" class="form-control" id="apellidos" name="apellidos" placeholder="Apellidos" required>
+                </div>
+                <div class="mb-3">
+                    <label for="documento" class="form-label">Documento PDF *</label>
+                    <input type="file" class="form-control" id="documento" name="documento" accept=".pdf" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Subir</button>
+            </form>
+        </div>
+
+    </div>
+     <!-- Bootstrap JS -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+{% endblock %}

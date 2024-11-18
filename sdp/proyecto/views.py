@@ -17,3 +17,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer """
 
 def index(request):
     return render(request,'index.html')
+
+def iniciarSesion(request):
+    return render(request,'iniciarSesion.html')
+
+def registrarse(request):
+    return render(request,'registrarse.html')
+
+def inicio(request):
+    return render(request,'inicio.html')
+
+def adjuntar(request):
+    return render(request,'adjuntar.html')
