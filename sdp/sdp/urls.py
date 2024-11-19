@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth.views import LogoutView
 from proyecto.views import buscar,ver,index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
 
 urlpatterns = [
@@ -10,7 +11,8 @@ urlpatterns = [
     path('inicio/',inicio, name='inicio'),
     path('adjuntar/',adjuntar, name='adjuntar'),
     path('verTesis/',ver,name='ver'),
-    path('buscar/',buscar,name='buscar')
+    path('buscar/',buscar,name='buscar'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout')
 ]
 
 
