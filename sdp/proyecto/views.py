@@ -117,6 +117,7 @@ def registrarse(request):
 Vista: INICIO
 Función: crear acceso a todas las opciones del usuario
 """
+############################################################################################################################
 def inicio(request):
     if request.user.is_authenticated:
         username = request.user.username
@@ -165,9 +166,134 @@ def inicio(request):
     return render(request,'inicio.html',context)
 ############################################################################################################################
 
-
+"""
+Vista: adjuntar tesis
+Función: subir el pdf para la tesis
+"""
+############################################################################################################################
 def adjuntar(request):
-    return render(request,'adjuntar.html')
+    if request.user.is_authenticated:
+        username = request.user.username
+        print(username)
+        email = request.user.email
+        print(email)
+        nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+        nombre1 = request.user.first_name
+    
+        # Obtener el rol del usuario desde la tabla `rolUsuario`
+        try:
+            rol = rolUsuario.objects.get(usuario=request.user)
+        except rolUsuario.DoesNotExist:
+            # Si no tiene un rol asociado, lanzar error 403
+            return render(request, '403.html', status=403)
+
+        # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
+        if rol.codigo_rol != 1:  # Solo estudiantes (1) y profesores (2) tienen acceso
+            return render(request, '403.html', status=403)
+        
+        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+
+    else:
+        # Usuario no autenticado
+        return render(request, '401.html', status=401)
+    
+    # Pasar los datos al contexto
+    context = {
+        'username': username,
+        'email': email,
+        'nombre_completo': nombre_completo,
+        'nombre1': nombre1,
+        'rol': rol.codigo_rol_descripcion,
+    }
+    return render(request,'adjuntar.html',context)
+############################################################################################################################
+
+"""
+Vista: ver detalle de la tesis tesis
+Función: ver los detalles de la tesis
+"""
+############################################################################################################################
+def ver(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        print(username)
+        email = request.user.email
+        print(email)
+        nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+        nombre1 = request.user.first_name
+    
+        # Obtener el rol del usuario desde la tabla `rolUsuario`
+        try:
+            rol = rolUsuario.objects.get(usuario=request.user)
+        except rolUsuario.DoesNotExist:
+            # Si no tiene un rol asociado, lanzar error 403
+            return render(request, '403.html', status=403)
+
+        # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
+        if rol.codigo_rol != 1:  # Solo estudiantes (1) y profesores (2) tienen acceso
+            return render(request, '403.html', status=403)
+        
+        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+
+    else:
+        # Usuario no autenticado
+        return render(request, '401.html', status=401)
+    
+    # Pasar los datos al contexto
+    context = {
+        'username': username,
+        'email': email,
+        'nombre_completo': nombre_completo,
+        'nombre1': nombre1,
+        'rol': rol.codigo_rol_descripcion,
+    }
+    return render(request,'ver_tesis_detalle.html',context)
+############################################################################################################################
+
+
+"""
+Vista: buscar anteproyectos de tesis 
+Función: buscar detalles de la tesis
+"""
+############################################################################################################################
+def buscar(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        print(username)
+        email = request.user.email
+        print(email)
+        nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+        nombre1 = request.user.first_name
+    
+        # Obtener el rol del usuario desde la tabla `rolUsuario`
+        try:
+            rol = rolUsuario.objects.get(usuario=request.user)
+        except rolUsuario.DoesNotExist:
+            # Si no tiene un rol asociado, lanzar error 403
+            return render(request, '403.html', status=403)
+
+        # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
+        if rol.codigo_rol != 1:  # Solo estudiantes (1) y profesores (2) tienen acceso
+            return render(request, '403.html', status=403)
+        
+        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+
+    else:
+        # Usuario no autenticado
+        return render(request, '401.html', status=401)
+    
+    # Pasar los datos al contexto
+    context = {
+        'username': username,
+        'email': email,
+        'nombre_completo': nombre_completo,
+        'nombre1': nombre1,
+        'rol': rol.codigo_rol_descripcion,
+    }
+    return render(request,'buscarE.html',context)
+############################################################################################################################
+
+
 
 
 """

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Buscar
+
+
+{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Buscar por nombre" aria-label="Buscar">
+                    <button class="btn btn-primary" type="submit">Buscar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Resultados -->
+    <div class="mt-4">
+        <!-- Tarjeta de resultado -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Tema: Sistema Web Detector de Plagios de Tesis</h5>
+                <p class="card-text">
+                    <strong>Autor:</strong> None <br>
+                    <strong>Fecha de aprobación:</strong> 29/08/2024 <br>
+                    <strong>Estado:</strong> Vigente <br>
+                    <strong>Enlace DOI:</strong> No disponible
+                </p>
+                <a href="#" class="btn btn-primary">Abrir</a>
+            </div>
+        </div>
+        <!-- Puedes replicar esta sección para más resultados -->
+
+{% endblock %}
