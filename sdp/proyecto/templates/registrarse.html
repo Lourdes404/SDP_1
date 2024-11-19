@@ -8,44 +8,65 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+    
+    <!-- Mensajes de error o éxito -->
+    <div id="error-message" class="alert alert-danger" style="display:none; padding-top: 0px;"></div>
+    <div id="success-message" class="alert alert-success" style="display:none;"></div>
+
     <div class="container vh-100 d-flex justify-content-center align-items-center">
         <div class="w-100" style="max-width: 600px;">
             <h2 class="text-center text-primary mb-4">Regístrate</h2>
-            <form>
-                <!-- Rol seleccionado -->
+            <form method="POST" id="register-form">
+                {% csrf_token %}
+                 <!-- Selección de rol -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Rol seleccionado: Profesor</label>
+                    <select class="form-select" id="rol" name="rol" required>
+                        <option selected disabled value="">Selecciona una opción</option>
+                        <option value="estudiante">Estudiante</option>
+                        <option value="profesor">Profesor</option>
+                    </select>
                 </div>
                 <!-- Nombres y Apellidos -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label for="nombres" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="nombres" placeholder="Nombres">
+                        <label for="nombres" class="form-label">Primer nombre</label>
+                        <input name="nombre1" type="text" class="form-control" id="nombres" placeholder="Nombres">
                     </div>
                     <div class="col-md-6">
-                        <label for="apellidos" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="apellidos" placeholder="Apellidos">
+                        <label for="apellidos" class="form-label">Segundo nombre</label>
+                        <input name="nombre2" type="text" class="form-control" id="apellidos" placeholder="Apellidos">
+                    </div>
+                </div>
+                <!-- Nombres y Apellidos -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="nombres" class="form-label">Primer apellido</label>
+                        <input name="apellido1" type="text" class="form-control" id="nombres" placeholder="Nombres">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apellidos" class="form-label">Segundo apellido</label>
+                        <input name="apellido2" type="text" class="form-control" id="apellidos" placeholder="Apellidos">
                     </div>
                 </div>
                 <!-- Correo Electrónico -->
                 <div class="mb-3">
                     <label for="correo" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="correo" placeholder="Correo electrónico">
+                    <input name="correo" type="email" class="form-control" id="correo" placeholder="Correo electrónico">
                 </div>
                 <!-- Nombre de Usuario -->
                 <div class="mb-3">
                     <label for="usuario" class="form-label">Crea un nombre de usuario</label>
-                    <input type="text" class="form-control" id="usuario" placeholder="Nombre de usuario">
+                    <input name="usuario" type="text" class="form-control" id="usuario" placeholder="Nombre de usuario">
                 </div>
                 <!-- Contraseña -->
                 <div class="mb-3">
                     <label for="contraseña" class="form-label">Crea una contraseña</label>
-                    <input type="password" class="form-control" id="contraseña" placeholder="Contraseña">
+                    <input name="contrasena" type="password" class="form-control" id="contrasena" placeholder="Contraseña">
                 </div>
                 <!-- Confirmar Contraseña -->
                 <div class="mb-3">
                     <label for="confirmar_contraseña" class="form-label">Confirma la contraseña</label>
-                    <input type="password" class="form-control" id="confirmar_contraseña" placeholder="Confirma la contraseña">
+                    <input name="confirmar_contrasena" type="password" class="form-control" id="confirmar_contrasena" placeholder="Confirma la contraseña">
                 </div>
                 <!-- Botón de envío -->
                 <button type="submit" class="btn btn-primary w-100">Crear cuenta</button>
@@ -53,7 +74,49 @@
         </div>
     </div>
 
+
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async function(event) {
+            event.preventDefault();  // Evitar el envío del formulario
+        
+            // Limpiar mensajes anteriores
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/registrarse/', {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const data = await response.json();
+        
+                if (response.ok) {
+                    // Mostrar mensaje de éxito y redirigir después de un breve retraso
+                    document.getElementById('success-message').textContent = data.success;
+                    document.getElementById('success-message').style.display = 'block';
+        
+                    setTimeout(function() {
+                        window.location.href = '/inicio/';  // Redirigir al inicio
+                    }, 2000);  // 2 segundos de espera antes de redirigir
+                } else {
+                    // Mostrar mensaje de error
+                    document.getElementById('error-message').textContent = data.error;
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } catch (error) {
+                // Error en la solicitud
+                document.getElementById('error-message').textContent = 'Hubo un error al procesar la solicitud.';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        });
+        </script>
+
 </body>
 </html>

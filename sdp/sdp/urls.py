@@ -10,3 +10,10 @@ urlpatterns = [
     path('inicio/',inicio, name='inicio'),
     path('adjuntar/',adjuntar, name='adjuntar')
 ]
+
+
+# Configuración de los handlers para errores
+handler404 = 'proyecto.views.custom_404_view'  
+handler500 = 'proyecto.views.custom_500_view'  
+handler403 = 'proyecto.views.custom_403_view'  
+handler400 = 'proyecto.views.custom_400_view'  
