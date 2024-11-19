@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from proyecto.views import index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
+from django.contrib.auth.views import LogoutView
+from proyecto.views import buscar,ver,index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -8,7 +9,10 @@ urlpatterns = [
     path('iniciarSesion/',iniciarSesion, name='iniciarSesion'),
     path('registrarse/',registrarse, name='registrarse'),
     path('inicio/',inicio, name='inicio'),
-    path('adjuntar/',adjuntar, name='adjuntar')
+    path('adjuntar/',adjuntar, name='adjuntar'),
+    path('verTesis/',ver,name='ver'),
+    path('buscar/',buscar,name='buscar'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout')
 ]
 
 

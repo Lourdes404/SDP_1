@@ -9,11 +9,10 @@ Inicio
 
 {% block content %}
 
-
+ <!-- Opciones estudiante -->
 <div class="container py-5">
     <!-- Título de bienvenida -->
-    <h1 class="">¡Bienvenido, Julio!</h1>
-    <p class="">Tu rol es: <strong>Estudiante</strong></p>
+    <h1 class="">¡{{ saludo }}, {{ nombre1 }}!</h1>
 
     <!-- Botones principales -->
     <div class="row text-center my-4">
@@ -21,18 +20,18 @@ Inicio
             <button class="btn btn-success w-100 py-3 fs-5">Curso</button>
         </div>
         <div class="col-md-6 mb-3">
-            <button class="btn btn-warning w-100 py-3 fs-5">Subir nuevo documento</button>
+            <a class="btn btn-warning w-100 py-3 fs-5" href="{% url 'adjuntar' %}">Subir nuevo documento</a>
         </div>
         <div class="col-md-6 mb-3">
             <button class="btn btn-info w-100 py-3 fs-5">Reporte</button>
         </div>
         <div class="col-md-6 mb-3">
-            <button class="btn btn-danger w-100 py-3 fs-5">Ver información de tesis</button>
+            <a class="btn btn-danger w-100 py-3 fs-5" href="{% url 'ver' %}">Ver información de tesis</a>
         </div>
     </div>
 
     <!-- Descripción -->
-    <p class="text-center text-muted">Aquí puedes ver los datos resumidos y análisis de tu aplicación.</p>
+    <p class="text-center text-muted">Aquí tienes acceso directo a todas las opciones de la aplicación.</p>
 </div>
 
 <!-- Bootstrap JS Bundle -->
