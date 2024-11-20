@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-^xa^q$xrnjw0ugdxp-u)fm4b056g7+^+j(-k874=x=vc3%dvmx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['148.113.44.119', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['148.113.44.119', 'localhost', '127.0.0.1','verifymydocs.com']
 
 
 
