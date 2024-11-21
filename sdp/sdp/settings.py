@@ -141,6 +141,6 @@ MICROSOFT = {
 }
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'  # Este es el prefijo de las URLs para archivos de usuario
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ruta donde se almacenan los archivos
 

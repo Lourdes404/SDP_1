@@ -1,6 +1,9 @@
 from django.contrib import admin
-from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from django.urls import path, re_path
 from django.contrib.auth.views import LogoutView
+from django.views.static import serve
 from proyecto.views import buscar,ver,index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
 
 urlpatterns = [
@@ -15,7 +18,14 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/'), name='logout')
 ]
 
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
 # Configuración de los handlers para errores
 handler404 = 'proyecto.views.custom_404_view'  
 handler500 = 'proyecto.views.custom_500_view'  

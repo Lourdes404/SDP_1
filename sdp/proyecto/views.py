@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login,authenticate
 from django.contrib.auth.models import User
@@ -8,6 +9,14 @@ from django.contrib import messages
 from .models import rolUsuario
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+import time
+from django.core.files.storage import FileSystemStorage
+import openai
+import os
+from PyPDF2 import PdfReader
+from django.conf import settings
+
+PENAI_API_KEY = ""
 
 """ import os
 import subprocess
@@ -172,6 +181,8 @@ Función: subir el pdf para la tesis
 """
 ############################################################################################################################
 def adjuntar(request):
+    modal_visible = False  # Indicador para mostrar el modal
+    file_url = None
     if request.user.is_authenticated:
         username = request.user.username
         print(username)
@@ -192,7 +203,19 @@ def adjuntar(request):
             return render(request, '403.html', status=403)
         
         print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
-
+        if request.method == 'POST':
+            uploaded_file = request.FILES.get('documento')
+            if uploaded_file and uploaded_file.name.endswith('.pdf'):
+                # Crear subcarpeta "Documentos" dentro de MEDIA_ROOT
+                documentos_path = os.path.join(settings.MEDIA_ROOT, 'Documentos')
+                if not os.path.exists(documentos_path):
+                    os.makedirs(documentos_path)
+                # Guardar el archivo
+                fs = FileSystemStorage(location=documentos_path, base_url=f"{settings.MEDIA_URL}Documentos/")
+                file_name = fs.save(uploaded_file.name, uploaded_file)
+                file_url = fs.url(file_name)
+                # Mostrar el modal
+                modal_visible = True
     else:
         # Usuario no autenticado
         return render(request, '401.html', status=401)
@@ -203,7 +226,10 @@ def adjuntar(request):
         'email': email,
         'nombre_completo': nombre_completo,
         'nombre1': nombre1,
+        'apellido1': request.user.last_name,
         'rol': rol.codigo_rol_descripcion,
+        'modal_visible': modal_visible,
+        'file_url': file_url,
     }
     return render(request,'adjuntar.html',context)
 ############################################################################################################################
@@ -311,3 +337,75 @@ def custom_403_view(request, exception):
 
 def custom_400_view(request, exception):
     return render(request, '400.html', status=400)
+
+
+
+"""
+------------NO VISTAS---------------------
+PROCEDIMIENTOS ÚTILES DEL PROYECTO
+
+NO AGREGAR VISTAS ABAJO POR FAVOR
+"""
+def extract_text_from_pdf(url_path):
+    # Construir la ruta de archivo desde la URL
+    relative_path = url_path.replace(settings.MEDIA_URL, "")  # Eliminar la parte de '/media/'
+    file_path = os.path.join(settings.MEDIA_ROOT, relative_path)  # Construir la ruta completa
+    
+    # Leer el archivo PDF
+    reader = PdfReader(file_path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text()
+
+    
+    return text
+
+
+def split_text_into_chunks(text, max_tokens=8192):
+    # Función para dividir el texto en fragmentos de tamaño máximo de tokens permitido
+    tokens = text.split()  # Suponiendo que cada palabra es un token
+    chunks = []
+    
+    while len(tokens) > max_tokens:
+        chunk = " ".join(tokens[:max_tokens])
+        chunks.append(chunk)
+        tokens = tokens[max_tokens:]
+    if tokens:
+        chunks.append(" ".join(tokens))
+    
+    return chunks
+
+def analyze_with_openai(text):
+    openai.api_key = PENAI_API_KEY
+    chunks = split_text_into_chunks(text)
+    print(datetime.timestamp.__str__)
+    while True:
+        try:
+            for chunk in chunks:
+                response = openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": "Analiza el siguiente texto y extrae información relevante:"},
+                        {"role": "user", "content": chunk}
+                    ]
+                )
+                print(response['choices'][0]['message']['content'])
+
+
+            return response['choices'][0]['message']['content']
+        except openai.error.RateLimitError as e:
+            # Esperar el tiempo que el mensaje de error indique antes de reintentar
+            print(f"Rate limit reached. Waiting for 60 seconds...")
+            time.sleep(60)  # Esperar antes de reintentar
+
+def analizar_prueba():
+
+    #Texto de prueba
+    url_path = "/media/Documentos/InformeAnálisisDeRiesgos.pdf"
+    text = extract_text_from_pdf(url_path)
+    print(text)
+    # Extraer texto y analizar con OpenAI
+    analysis = analyze_with_openai(text)
+
+    print(JsonResponse({"analysis": analysis}))
+#analizar_prueba()
