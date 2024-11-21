@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
-from .models import rolUsuario
+from .models import rolUsuario, documento
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 import time
@@ -183,11 +183,11 @@ Función: subir el pdf para la tesis
 def adjuntar(request):
     modal_visible = False  # Indicador para mostrar el modal
     file_url = None
+    documento_existente = None  # Para verificar si el usuario ya tiene un documento
+
     if request.user.is_authenticated:
         username = request.user.username
-        print(username)
         email = request.user.email
-        print(email)
         nombre_completo = f"{request.user.first_name} {request.user.last_name}"
         nombre1 = request.user.first_name
     
@@ -203,19 +203,47 @@ def adjuntar(request):
             return render(request, '403.html', status=403)
         
         print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+        
+        # Verificar si el usuario ya tiene un documento
+        try:
+            documento_existente = documento.objects.get(usuario=request.user)
+            file_url = documento_existente.ubicacion.url  # Obtener la URL del documento actual
+            print(f"Documento existente encontrado: {file_url}")  # Debug
+        except documento.DoesNotExist:
+            print("No hay documento existente para este usuario.")  # Debug
+
         if request.method == 'POST':
-            uploaded_file = request.FILES.get('documento')
+            uploaded_file = request.FILES.get('documento')  # Obtener el archivo del formulario
+            print(f"Archivo recibido: {uploaded_file}")  # Depuración
+            
             if uploaded_file and uploaded_file.name.endswith('.pdf'):
-                # Crear subcarpeta "Documentos" dentro de MEDIA_ROOT
-                documentos_path = os.path.join(settings.MEDIA_ROOT, 'Documentos')
-                if not os.path.exists(documentos_path):
-                    os.makedirs(documentos_path)
-                # Guardar el archivo
-                fs = FileSystemStorage(location=documentos_path, base_url=f"{settings.MEDIA_URL}Documentos/")
-                file_name = fs.save(uploaded_file.name, uploaded_file)
-                file_url = fs.url(file_name)
-                # Mostrar el modal
-                modal_visible = True
+                if documento_existente:
+                    print(documento_existente)
+                    # Mostrar un modal para confirmar la actualización
+                    if 'confirmar_actualizacion' in request.POST:
+                        # El usuario confirmó la actualización
+                        documento_existente.ubicacion = uploaded_file
+                        documento_existente.save()
+                        file_url = documento_existente.ubicacion.url
+                        print(f"Documento actualizado en: {file_url}")  # Debug
+                        modal_visible = True
+                    else:
+                        # El usuario aún no confirmó, mostrar el modal
+                        modal_visible = 'actualizacion'
+                else:
+                    # Crear un nuevo documento para el usuario
+                    nuevo_documento = documento(usuario=request.user, ubicacion=uploaded_file)
+                    nuevo_documento.save()
+                    file_url = nuevo_documento.ubicacion.url
+                    print(f"Nuevo documento guardado en: {file_url}")  # Debug
+                    modal_visible = True
+            else:
+                # Si el archivo no es PDF
+                print("Error: El archivo no es PDF")
+                modal_visible = False
+                file_url = None
+        else:
+            modal_visible = False
     else:
         # Usuario no autenticado
         return render(request, '401.html', status=401)
@@ -230,8 +258,10 @@ def adjuntar(request):
         'rol': rol.codigo_rol_descripcion,
         'modal_visible': modal_visible,
         'file_url': file_url,
+        'documento_existente': documento_existente,
     }
-    return render(request,'adjuntar.html',context)
+    
+    return render(request, 'adjuntar.html', context)
 ############################################################################################################################
 
 """

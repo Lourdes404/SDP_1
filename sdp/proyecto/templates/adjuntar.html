@@ -46,6 +46,26 @@
         </div>
     </div>
 
+    
+    {% if modal_visible == 'actualizacion' %}
+    <!-- Modal para confirmar la actualización -->
+    <div id="actualizarModal" class="modal" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                <p>Ya has subido un documento anteriormente.</p>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% elif modal_visible %}
     <!-- Modal -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -63,13 +83,17 @@
             </div>
         </div>
     </div>
-
+    {% endif %}
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     {% if modal_visible %}
     <script>
         var myModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+        myModal.show();
+    </script>
+    <script>
+        var myModal = new bootstrap.Modal(document.getElementById('actualizarModal'));
         myModal.show();
     </script>
     {% endif %}
