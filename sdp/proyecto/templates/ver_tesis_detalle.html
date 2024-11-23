@@ -8,32 +8,45 @@ Tesis
 {% endblock %}
 
 {% block content %}
+
+<style>
+
+    body {
+        display: flex;
+        height: auto;
+        overflow: auto;
+    }
+</style>
     <div class="container my-5">
-        <div class="text-center">
-            <h1 class="fw-bold">Sistema Web Detector de Plagios de Tesis prueba 43</h1>
-            <p class="text-muted">Lourdes Pérez</p>
-            <a href="#" class="btn btn-primary">Ver PDF</a>
+        <div class="">
+            <h1 class="fw-bold">{{ nombreT }}</h1>
+            <p class="text-muted">{{ nombre_completo }}</p>
+            <a class="btn btn-link text-primary" href="{{ path }}">Clic para ver PDF: {{ nombredoc }}</a>
         </div>
 
         <div class="mt-5">
             <h2 class="fw-bold">Pregunta de investigación</h2>
-            <p>
-                ¿Cómo puede optimizarse el proceso de consulta de anteproyectos de tesis en la Facultad de Ingeniería en Sistemas de Información de una universidad guatemalteca para gestionar los proyectos aprobados y reducir la probabilidad de plagio o duplicidad?
-            </p>
+            <p>{{ pregunta }}</p>
         </div>
 
         <div class="mt-4">
             <h2 class="fw-bold">Objetivo general</h2>
-            <p>
-                Mejorar el proceso de revisión de tesis aprobadas en la fase de anteproyecto para los docentes y estudiantes de Proyecto de Graduación en una universidad guatemalteca.
-            </p>
+            <p>{{ objetivo }}</p>
         </div>
 
         <div class="mt-4">
-            <h2 class="fw-bold">Resumen</h2>
-            <p>
-                El objetivo de la investigación es mejorar el proceso de revisión de tesis aprobadas en la fase de anteproyecto para docentes y estudiantes, facilitando la detección de proyectos duplicados, automatizando el proceso de revisión y creando una base de datos que permita a los estudiantes visualizar los títulos de los proyectos para reducir la duplicidad y el plagio.
-            </p>
+            <h2 class="fw-bold">Hipótesis</h2>
+            <p>{{ hipotesis }}</p>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="fw-bold">Justificación</h2>
+            <p>{{ Justificacion }}</p>
+        </div>
+
+        <div class="mt-4">
+            <h2 class="fw-bold">Problema</h2>
+            <p>{{ problema }}</p>
         </div>
     </div>
 

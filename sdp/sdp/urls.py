@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.urls import path, re_path
 from django.contrib.auth.views import LogoutView
 from django.views.static import serve
-from proyecto.views import buscar,ver,index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
+from proyecto.views import reporte,ListadoEstudiantes,detalleForm,buscar,ver,index,iniciarSesion,registrarse, inicio, adjuntar # Asegúrate de importar la vista
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,7 +15,12 @@ urlpatterns = [
     path('adjuntar/',adjuntar, name='adjuntar'),
     path('verTesis/',ver,name='ver'),
     path('buscar/',buscar,name='buscar'),
-    path('logout/', LogoutView.as_view(next_page='/'), name='logout')
+    path('detalle/', detalleForm, name='detalleForm'),
+    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+    path('listadoEstudiantes/',ListadoEstudiantes,name='listadoEstudiantes'),
+    path('reporteAnalisis/', reporte, name='reporte')
+
+
 ]
 
 # if settings.DEBUG:

@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
-from .models import rolUsuario, documento
+from .models import rolUsuario, documento, InformacionAnalizada,AnalisisSimilitud
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 import time
@@ -15,6 +15,10 @@ import openai
 import os
 from PyPDF2 import PdfReader
 from django.conf import settings
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from django.core.exceptions import ValidationError
 
 PENAI_API_KEY = ""
 
@@ -198,9 +202,9 @@ def adjuntar(request):
             # Si no tiene un rol asociado, lanzar error 403
             return render(request, '403.html', status=403)
 
-        # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
+        """ # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
         if rol.codigo_rol != 1:  # Solo estudiantes (1) y profesores (2) tienen acceso
-            return render(request, '403.html', status=403)
+            return render(request, '403.html', status=403) """
         
         print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
         
@@ -290,7 +294,15 @@ def ver(request):
             return render(request, '403.html', status=403)
         
         print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
-
+        ##################################################################################
+        #PROCEDIMIENTO DE LA VISTA
+        documentos  = documento.objects.filter(usuario=request.user)
+        doc = documentos.first()
+        tesisLista = InformacionAnalizada.objects.filter(documento = doc)
+        tesis = tesisLista.first()
+        ruta_relativa = doc.ubicacion.name  # Esto debería ser "Documentos/lourdes2/Proyecto_3.pdf"
+        ruta_completa = f"{settings.MEDIA_URL}{ruta_relativa}"  # "media/Documentos/lourdes2/Proyecto_3.pdf"
+        print(ruta_completa)
     else:
         # Usuario no autenticado
         return render(request, '401.html', status=401)
@@ -302,6 +314,14 @@ def ver(request):
         'nombre_completo': nombre_completo,
         'nombre1': nombre1,
         'rol': rol.codigo_rol_descripcion,
+        'nombreT': tesis.nombre,
+        'pregunta': tesis.pregunta,
+        'objetivo': tesis.objetivo,
+        'hipotesis': tesis.hipotesis,
+        'justificacion': tesis.justificacion,
+        'problema': tesis.problema,
+        'path': ruta_completa,
+        'nombredoc': os.path.basename(ruta_relativa)
     }
     return render(request,'ver_tesis_detalle.html',context)
 ############################################################################################################################
@@ -313,6 +333,143 @@ Función: buscar detalles de la tesis
 """
 ############################################################################################################################
 def buscar(request):
+    # Verificar si el usuario está autenticado
+    if not request.user.is_authenticated:
+        return render(request, '403.html', status=403)
+
+    # Obtener el rol del usuario desde la tabla `rolUsuario`
+    try:
+        rol = rolUsuario.objects.get(usuario=request.user)
+    except rolUsuario.DoesNotExist:
+        return render(request, '403.html', status=403)
+
+    if rol.codigo_rol != 1:  # Verificar permisos de rol
+        return render(request, '403.html', status=403)
+
+    # Inicializar el contexto
+    resultados = []
+    query = request.GET.get('q', '').strip()  # Obtener el texto de búsqueda del usuario
+    print(query)
+    if query:  # Si hay un texto para buscar
+        # Obtener todas las entradas de `InformacionAnalizada`
+        documentos = InformacionAnalizada.objects.all()
+
+        # Concatenar los campos de cada documento en una sola cadena de texto
+        corpus = []
+        ids = []
+        for doc in documentos:
+            texto_completo = f"{doc.nombre or ''} {doc.pregunta or ''} {doc.objetivo or ''} {doc.hipotesis or ''} {doc.justificacion or ''} {doc.problema or ''}"
+            corpus.append(texto_completo)
+            ids.append(doc.id)  # Guardar ID para referencia posterior
+            print(texto_completo)
+            print(ids)
+        # Crear un vector TF-IDF para medir similitudes
+        print('Crear un vector TF-IDF para medir similitudes')
+        vectorizer = TfidfVectorizer().fit_transform([query] + corpus)  # El primer elemento será el texto de búsqueda
+        print(vectorizer)
+        cosine_similarities = cosine_similarity(vectorizer[0:1], vectorizer[1:]).flatten()  # Calcular similitud de coseno
+        print(cosine_similarities)
+        print('Ordenar los documentos por similitud (de mayor a menor)')
+        documentos_similares = sorted(
+            zip(ids, cosine_similarities),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        print(documentos_similares)
+
+        print('Filtrar documentos con similitud mayor a 0')
+        for doc_id, similarity in documentos_similares:
+            if similarity > 0:
+                doc = InformacionAnalizada.objects.get(id=doc_id)
+                resultados.append({
+                    'nombre': doc.nombre,
+                    'autor': doc.documento.usuario.first_name if doc.documento.usuario else 'No disponible',
+                    'similitud': round(similarity * 100, 2)  # Convertir a porcentaje
+                })
+
+    print('Contexto para renderizar la página')
+    print(resultados)
+    context = {
+        'resultados': resultados,
+        'query': query,
+    }
+    return render(request, 'buscarE.html', context)
+############################################################################################################################
+
+"""
+Vista: Detalles analizados del proyecto 
+Función: mostrar el analisis y si es necesario, editarlo
+"""
+############################################################################################################################
+def detalleForm(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        print(username)
+        email = request.user.email
+        print(email)
+        nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+        nombre1 = request.user.first_name
+
+        # Obtener el rol del usuario desde la tabla `rolUsuario`
+        try:
+            rol = rolUsuario.objects.get(usuario=request.user)
+        except rolUsuario.DoesNotExist:
+            # Si no tiene un rol asociado, lanzar error 403
+            return render(request, '403.html', status=403)
+        
+        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+
+    else:
+        # Usuario no autenticado
+        return render(request, '401.html', status=401)
+    ##################################################################################
+    #PROCEDIMIENTO DE LA VISTA
+    if request.method == 'POST':
+        nombreTesis = request.POST.get('nombre')
+        preguntaT = request.POST.get('pregunta')
+        objetivoT = request.POST.get('objetivo')
+        hipotesisT = request.POST.get('hipotesis')
+        justificacionT = request.POST.get('justificacion')
+        problemaT = request.POST.get('problema')
+        
+        try:
+            documentos  = documento.objects.filter(usuario=request.user)
+            doc = documentos.first()
+            if not doc:
+                print('No se encontró ningún documento para este usuario')
+                return
+            tesis = InformacionAnalizada(
+                documento = doc,
+                nombre = nombreTesis,
+                pregunta = preguntaT,
+                objetivo = objetivoT,
+                hipotesis = hipotesisT,
+                justificacion = justificacionT,
+                problema = problemaT
+            )
+            tesis.save()
+            print('Se insertó correctamente')
+            return redirect('inicio')
+        except:
+            print('Hubo un error al insertar en esta tabla')
+
+    # Pasar los datos al contexto
+    context = {
+        'username': username,
+        'email': email,
+        'nombre_completo': nombre_completo,
+        'nombre1': nombre1,
+        'rol': rol.codigo_rol_descripcion,
+    }
+    return render(request,'proyectoForm.html',context)
+############################################################################################################################
+
+"""
+Vista: Detalles analizados del proyecto 
+Función: mostrar el analisis y si es necesario, editarlo
+"""
+############################################################################################################################
+def ListadoEstudiantes(request):
     if request.user.is_authenticated:
         username = request.user.username
         print(username)
@@ -326,10 +483,6 @@ def buscar(request):
             rol = rolUsuario.objects.get(usuario=request.user)
         except rolUsuario.DoesNotExist:
             # Si no tiene un rol asociado, lanzar error 403
-            return render(request, '403.html', status=403)
-
-        # Validar que el rol tiene acceso (usuarios tipo 1 y 2)
-        if rol.codigo_rol != 1:  # Solo estudiantes (1) y profesores (2) tienen acceso
             return render(request, '403.html', status=403)
         
         print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
@@ -346,11 +499,66 @@ def buscar(request):
         'nombre1': nombre1,
         'rol': rol.codigo_rol_descripcion,
     }
-    return render(request,'buscarE.html',context)
+    return render(request,'listadoEstudiantes.html',context)
 ############################################################################################################################
 
-
-
+"""
+Vista: Reporte de análisis
+Función: mostrar el analisis de la tesis de studiante
+"""
+############################################################################################################################
+def reporte(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        print(username)
+        email = request.user.email
+        print(email)
+        nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+        nombre1 = request.user.first_name
+    
+        # Obtener el rol del usuario desde la tabla `rolUsuario`
+        try:
+            rol = rolUsuario.objects.get(usuario=request.user)
+        except rolUsuario.DoesNotExist:
+            # Si no tiene un rol asociado, lanzar error 403
+            return render(request, '403.html', status=403)
+        
+        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
+        print('Obtener info de la tesis para su análisis')
+        documentos  = documento.objects.filter(usuario=request.user)
+        doc = documentos.first()
+        tesisLista = InformacionAnalizada.objects.filter(documento = doc)
+        informacion = tesisLista.first()
+        print(informacion.nombre)
+        print('Validar máximo análisis')
+        validar_maximo_analisis(informacion)
+        print(validar_maximo_analisis)
+        # Calcular porcentaje de similitud (ejemplo de lógica externa)
+        porcentaje_similitud = calcular_similitud(informacion)
+        print('Porcentaje de similitud...')
+        print(porcentaje_similitud)
+        # Crear análisis
+        analisis = AnalisisSimilitud.objects.create(
+            informacion_analizada=informacion,
+            porcentaje_similitud=porcentaje_similitud
+        )
+        print('Analisis guardado con el porcentaje: ')
+        print(analisis.porcentaje_similitud)
+    else:
+        # Usuario no autenticado
+        return render(request, '401.html', status=401)
+    
+    # Pasar los datos al contexto
+    context = {
+        'username': username,
+        'email': email,
+        'nombre_completo': nombre_completo,
+        'nombre1': nombre1,
+        'rol': rol.codigo_rol_descripcion,
+        'analisis': analisis,
+    }
+    return render(request,'reporte.html',context)
+############################################################################################################################
 
 """
 Templates: PÁGINAS DE ERROR
@@ -409,33 +617,83 @@ def analyze_with_openai(text):
     openai.api_key = PENAI_API_KEY
     chunks = split_text_into_chunks(text)
     print(datetime.timestamp.__str__)
-    while True:
-        try:
-            for chunk in chunks:
-                response = openai.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[
-                        {"role": "system", "content": "Analiza el siguiente texto y extrae información relevante:"},
-                        {"role": "user", "content": chunk}
-                    ]
-                )
-                print(response['choices'][0]['message']['content'])
+    #while True:
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "Analiza la pregunta de tesis. Si no encuentras nada, porfis solo responde: None:"},
+                {"role": "user", "content": text}
+            ]
+        )
+        print(response['choices'][0]['message']['content'])
 
 
-            return response['choices'][0]['message']['content']
-        except openai.error.RateLimitError as e:
-            # Esperar el tiempo que el mensaje de error indique antes de reintentar
-            print(f"Rate limit reached. Waiting for 60 seconds...")
-            time.sleep(60)  # Esperar antes de reintentar
+        return response['choices'][0]['message']['content']
+    except openai.error.RateLimitError as e:
+        # Esperar el tiempo que el mensaje de error indique antes de reintentar
+        print(f"Rate limit reached. Waiting for 60 seconds...")
+        time.sleep(60)  # Esperar antes de reintentar
 
 def analizar_prueba():
 
     #Texto de prueba
-    url_path = "/media/Documentos/InformeAnálisisDeRiesgos.pdf"
+    url_path = "/media/Documentos/lourdes2/Entrega4.pdf"
     text = extract_text_from_pdf(url_path)
     print(text)
     # Extraer texto y analizar con OpenAI
     analysis = analyze_with_openai(text)
 
     print(JsonResponse({"analysis": analysis}))
+
+
+def validar_maximo_analisis(tesis):
+    print('Cantidad de análisis: ')
+    var = AnalisisSimilitud.objects.filter(informacion_analizada=tesis).count()
+    print(var)
+    if var >= 20:
+        print('No se puede analizar más... límite alcanzado.')
+        raise ValidationError("Un usuario no puede tener más de 20 análisis de tesis.")
+
+def calcular_similitud(informacion):
+    """
+    Calcula el porcentaje de similitud de un texto analizado con otros documentos en la base de datos.
+
+    :param informacion: Objeto del modelo InformacionAnalizada que contiene el texto a analizar.
+    :return: Porcentaje de similitud más alto con otros documentos en la base de datos.
+    """
+    # Preparar el texto del documento actual
+    texto_actual = f"{informacion.nombre or ''} {informacion.pregunta or ''} {informacion.objetivo or ''} {informacion.hipotesis or ''} {informacion.justificacion or ''} {informacion.problema or ''}"
+    print('Informacion')
+    print(texto_actual)
+    print('Obtener todos los textos de la base de datos (excluyendo el actual)')
+    documentos = InformacionAnalizada.objects.exclude(id=informacion.id)
+    print(f"Documentos excluyendo el actual: {documentos}")
+
+    textos_completos = [
+        f"{doc.nombre or ''} {doc.pregunta or ''} {doc.objetivo or ''} {doc.hipotesis or ''} {doc.justificacion or ''} {doc.problema or ''}"
+        for doc in documentos
+    ]
+
+    if not textos_completos:
+        print("No hay documentos para comparar.")
+        return 0  # Retorna 0% de similitud en caso de que no haya documentos.
+
+    
+    # Incluir el texto actual en la lista para calcular similitudes
+    textos_completos.append(texto_actual)
+
+    # Vectorización TF-IDF
+    vectorizer = TfidfVectorizer().fit_transform(textos_completos)
+    tfidf_matrix = vectorizer.toarray()
+
+    # Calcular similitud coseno
+    similitudes = cosine_similarity(tfidf_matrix[-1:], tfidf_matrix[:-1])
+    print(similitudes)
+    # Obtener el porcentaje de similitud más alto
+    porcentaje_similitud = max(similitudes[0], default=0) * 100  # Convertir a porcentaje
+
+    return round(porcentaje_similitud, 2)
+
+
 #analizar_prueba()

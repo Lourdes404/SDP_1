@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Estudiantes{% endblock %}
+
+{% block content %}
+<style>
+
+        body {
+            display: flex;
+            height: auto;
+            overflow: auto;
+        }
+</style>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Listado de Estudiantes</h2>
+        <div class="row mb-3">
+            <div class="col-sm-6">
+                <label for="entries" class="form-label">Mostrar</label>
+                <select id="entries" class="form-select d-inline-block w-auto">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                </select>
+                <span>registros</span>
+            </div>
+            <div class="col-sm-6 text-end">
+                <input type="text" class="form-control d-inline-block w-auto" placeholder="Buscar...">
+            </div>
+        </div>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Grado</th>
+                    <th>Última Actualización</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Juan Pérez</td>
+                    <td>10°</td>
+                    <td>2024-11-20 10:45:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>María López</td>
+                    <td>11°</td>
+                    <td>2024-11-19 15:30:00</td>
+                    <td class="table-actions">
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Agrega más filas según sea necesario -->
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <span>Mostrando 1 a 2 de un total de 2 registros</span>
+            <nav>
+                <ul class="pagination pagination-sm">
+                    <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+                </ul>
+            </nav>
+        </div>
+        <button class="btn btn-primary mt-3">Agregar Estudiante</button>
+    </div>
+
+    <!-- Bootstrap JS and Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
+
+    {% endblock %}

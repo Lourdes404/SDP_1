@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Anteproyecto{% endblock %}
+
+{% block content %}
+<style>
+    
+    body {
+            display: flex;
+            height: auto;
+            overflow: auto;
+            background-color: #f5f5f5;
+        }
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Detalles de anteproyecto</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="textarea1" class="form-label">Nombre del proyecto</label>
+                <textarea class="form-control" id="textarea1" rows="3" placeholder="Escribe el nombre de tu proyecto." name="nombre"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="textarea1" class="form-label">Pregunta</label>
+                <textarea class="form-control" id="textarea1" rows="3" placeholder="Escribe la pregunta de tu proyecto." name="pregunta"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="textarea2" class="form-label">Objetivo</label>
+                <textarea class="form-control" id="textarea2" rows="3" placeholder="Escribe el objetivo de tu proyecto." name="objetivo"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="textarea3" class="form-label">Hipótesis</label>
+                <textarea class="form-control" id="textarea3" rows="3" placeholder="Escribe la hipótesis de tu proyecto." name="hipotesis"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="textarea4" class="form-label">Justificación</label>
+                <textarea class="form-control" id="textarea4" rows="3" placeholder="Escribe la justificación de tu proyecto." name="justificacion"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="textarea5" class="form-label">Problema</label>
+                <textarea class="form-control" id="textarea5" rows="3" placeholder="Escribe el problema de tu proyecto." name="problema"></textarea>
+            </div>
+                <button style="width: 100%;" type="submit" class="btn btn-success">Guardar</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+{% endblock %}
