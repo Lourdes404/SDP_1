@@ -69,12 +69,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SDP',  # Nombre de la base de datos
-        'USER': 'lourdes',  # Usuario
-        'PASSWORD': 'N30TTNNs.',  # Contraseña
-        'HOST': 'sdpservidor.database.windows.net',  # Endpoint de la RDS
-        'PORT': '',  # Puerto
+        'USER': 'sa',  # Usuario
+        'PASSWORD': 'Grupo@Delta22',  # Contraseña
+        'HOST': '54.89.102.36',  # Endpoint de la RDS
+        'PORT': '1433',  # Puerto
         'OPTIONS': {
-            'driver': 'ODBC Driver 18 for SQL Server',  # Driver ODBC instalado en tu sistema
+            'driver': 'ODBC Driver 17 for SQL Server',  # Driver ODBC instalado en tu sistema
             #'TrustServerCertificate': 'yes',
         },
     }

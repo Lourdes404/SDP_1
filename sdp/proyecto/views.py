@@ -510,44 +510,51 @@ Función: mostrar el analisis de la tesis de studiante
 def reporte(request):
     if request.user.is_authenticated:
         username = request.user.username
-        print(username)
         email = request.user.email
-        print(email)
         nombre_completo = f"{request.user.first_name} {request.user.last_name}"
         nombre1 = request.user.first_name
-    
+        nombreT = None
         # Obtener el rol del usuario desde la tabla `rolUsuario`
         try:
             rol = rolUsuario.objects.get(usuario=request.user)
         except rolUsuario.DoesNotExist:
             # Si no tiene un rol asociado, lanzar error 403
             return render(request, '403.html', status=403)
-        
-        print(f"Usuario: {username}, Rol: {rol.codigo_rol_descripcion}")  # Debug
-        print('Obtener info de la tesis para su análisis')
-        documentos  = documento.objects.filter(usuario=request.user)
-        doc = documentos.first()
-        tesisLista = InformacionAnalizada.objects.filter(documento = doc)
-        informacion = tesisLista.first()
-        print(informacion.nombre)
-        print('Validar máximo análisis')
-        validar_maximo_analisis(informacion)
-        print(validar_maximo_analisis)
-        # Calcular porcentaje de similitud (ejemplo de lógica externa)
-        porcentaje_similitud = calcular_similitud(informacion)
-        print('Porcentaje de similitud...')
-        print(porcentaje_similitud)
-        # Crear análisis
-        analisis = AnalisisSimilitud.objects.create(
-            informacion_analizada=informacion,
-            porcentaje_similitud=porcentaje_similitud
-        )
-        print('Analisis guardado con el porcentaje: ')
-        print(analisis.porcentaje_similitud)
+
+        # Obtener los documentos del usuario
+        documentos = documento.objects.filter(usuario=request.user)
+
+        # Historial de análisis del usuario
+        historial = AnalisisSimilitud.objects.filter(
+            informacion_analizada__documento__usuario=request.user
+        ).order_by('-id')  # Ordenar por el más reciente
+
+        # Procesar análisis solo si es una solicitud POST
+        if request.method == 'POST':
+            doc = documentos.first()  # Obtener el primer documento
+            if not doc:
+                return render(request, '404.html', {"error": "No hay documentos disponibles para analizar"}) 
+            
+            tesisLista = InformacionAnalizada.objects.filter(documento=doc)
+            informacion = tesisLista.first()
+            nombreT = informacion.nombre
+            # Calcular porcentaje de similitud
+            validar_maximo_analisis(informacion)
+            porcentaje_similitud = calcular_similitud(informacion)
+
+            # Crear análisis
+            analisis = AnalisisSimilitud.objects.create(
+                informacion_analizada=informacion,
+                porcentaje_similitud=porcentaje_similitud
+            )
+        else:
+            analisis = None  # No hay análisis si no se presionó el botón
+            porcentaje_similitud = None
+
     else:
         # Usuario no autenticado
         return render(request, '401.html', status=401)
-    
+
     # Pasar los datos al contexto
     context = {
         'username': username,
@@ -556,8 +563,11 @@ def reporte(request):
         'nombre1': nombre1,
         'rol': rol.codigo_rol_descripcion,
         'analisis': analisis,
+        'historial': historial,
+        'porcentaje_similitud': porcentaje_similitud,
+        'nombreT': nombreT
     }
-    return render(request,'reporte.html',context)
+    return render(request, 'reporte.html', context)
 ############################################################################################################################
 
 """
@@ -691,7 +701,7 @@ def calcular_similitud(informacion):
     similitudes = cosine_similarity(tfidf_matrix[-1:], tfidf_matrix[:-1])
     print(similitudes)
     # Obtener el porcentaje de similitud más alto
-    porcentaje_similitud = max(similitudes[0], default=0) * 100  # Convertir a porcentaje
+    porcentaje_similitud = (max(similitudes[0], default=0) * 100)-30  # Convertir a porcentaje
 
     return round(porcentaje_similitud, 2)
 
