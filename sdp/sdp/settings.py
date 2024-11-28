@@ -65,21 +65,28 @@ WSGI_APPLICATION = 'sdp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SDP',  # Nombre de la base de datos
-        'USER': 'lourdes',  # Usuario
-        'PASSWORD': 'N30TTNNs.',  # Contraseña
-        'HOST': 'sdpservidor.database.windows.net',  # Endpoint de la RDS
-        'PORT': '',  # Puerto
+        'USER': 'sa',  # Usuario
+        'PASSWORD': 'Grupo@Delta22',  # Contraseña
+        'HOST': '54.89.102.36',  # Endpoint de la RDS
+        'PORT': '1433',  # Puerto
         'OPTIONS': {
-            'driver': 'ODBC Driver 18 for SQL Server',  # Driver ODBC instalado en tu sistema
+            'driver': 'ODBC Driver 17 for SQL Server',  # Driver ODBC instalado en tu sistema
             #'TrustServerCertificate': 'yes',
         },
     }
 }
+ """
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # Archivo SQLite en tu directorio base
+    }
+}
 
 
 # Password validation
