@@ -65,7 +65,7 @@ WSGI_APPLICATION = 'sdp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'SDP',  # Nombre de la base de datos
@@ -79,7 +79,14 @@ DATABASES = {
         },
     }
 }
+ """
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # Archivo SQLite en tu directorio base
+    }
+}
 
 
 # Password validation
